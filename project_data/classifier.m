@@ -1,59 +1,28 @@
- 
 
- voice = audioread("recordings\p232_001.wav");
- noise = randn(1600, 1);
+voice = audioread('recordings/p232_100.wav');
 
- train_data = [];
- labels = [];
+angles = -175:5:180;
+n_angles = length(angles);
+labels = deg2class(angles);
 
- for i = -175:5:180
-    H_front = getHRIR(80, 0, i, "front");
-    H_back = getHRIR(80, 0, i, "middle");
+features = zeros(n_angles, 4);
 
+for i = 1:n_angles
+    angle = angles(i);
+    hrir = [getHRIR(80, 0, angle, "front").data getHRIR(80, 0, angle, "middle").data]; 
 
-    H_front = downsample(H_front.data, 3);
-    H_back = downsample(H_back.data, 3);
-
-    T_front = conv2(H_front, voice);
-    T_front = T_front + 0.001 * randn(length(T_front), 2);
-
-    T_back = conv2(H_back, voice);
-    T_back = T_back + 0.001 * randn(length(T_back), 2);
-
-    signals = [T_front(:, 1), T_back(:, 1), T_front(:, 2), T_back(:, 2)];
-    features = generate_features(signals);
-
-    % features = [gccphat(T_front(:,1), T_front(:,2)) 
-    %             gccphat(T_back(:,1), T_back(:,2)) 
-    %             gccphat(T_front(:,1), T_back(:,1)) 
-    %             gccphat(T_front(:,2), T_back(:,2))];
+    hrir = hrir(:,[1 3 2 4]); % Create order of sources as in evaluation data
+    hrir = downsample(hrir, 3);
     
-    
-    if(-150 < i && i < -90)
-        label = 1;
-    elseif(-90 < i && i < -30)
-        label = 2;
-    elseif(-30 < i && i < 30)
-        label = 3;
-    elseif(30 < i && i < 90)
-        label = 4;
-    elseif(90 < i && i < 150)
-        label = 5;
-    else 
-        label = 6;
-    end
+    clean_mic_signals = convn(hrir, voice);
+    noisy_mic_signals = clean_mic_signals + 0.005 * randn(size(clean_mic_signals));    
+  
+    features(i,:) = generate_features(noisy_mic_signals).';
+end
 
-    train_data = [train_data; features.'];
-    labels = [labels; label];
- end
+random_forest = TreeBagger(50, features, labels);
 
- classifier = TreeBagger(250, train_data, labels);
- 
-
- eval_data = load("evaluation_data.mat");
-
- classifier(eval_data);
- 
+outputs = test_classifier(random_forest);
 
 
- 
+
