@@ -1,28 +1,16 @@
+cv = cvpartition(length(features), "HoldOut", 0.3);
+index = cv.test;
 
-voice = audioread('recordings/p232_100.wav');
+random_forest = TreeBagger(10, features(~index,:), labels(1,~index));
 
-angles = -175:5:180;
-n_angles = length(angles);
-labels = deg2class(angles);
+test_labels = labels(1, index);
 
-features = zeros(n_angles, 4);
+preds = str2double(predict(random_forest, features(index,:)));
 
-for i = 1:n_angles
-    angle = angles(i);
-    hrir = [getHRIR(80, 0, angle, "front").data getHRIR(80, 0, angle, "middle").data]; 
+outputs = preds == test_labels.';
+score = sum(outputs)/length(outputs);    
 
-    hrir = hrir(:,[1 3 2 4]); % Create order of sources as in evaluation data
-    hrir = downsample(hrir, 3);
-    
-    clean_mic_signals = convn(hrir, voice);
-    noisy_mic_signals = clean_mic_signals + 0.005 * randn(size(clean_mic_signals));    
-  
-    features(i,:) = generate_features(noisy_mic_signals).';
-end
-
-random_forest = TreeBagger(50, features, labels);
-
-outputs = test_classifier(random_forest);
+outputs_dev_data = test_classifier(random_forest);
 
 
 
