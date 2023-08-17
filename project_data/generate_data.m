@@ -19,7 +19,7 @@ snr_data = randi(length(SNRs), 1, n_scenarios);
 elevation_data = randi(length(elevations), 1, n_scenarios);
 distance_data = randi(length(distances), 1, n_scenarios);
 
-features = zeros(n_scenarios, 4);
+features = zeros(n_scenarios, 8);
 
 reverb = reverberator('WetDryMix', 0.1, 'Diffusion', 0.01, 'SampleRate', 16000);
 

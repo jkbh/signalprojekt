@@ -7,9 +7,9 @@ n_angles = length(angles);
 
 n = numel(files);
 
-n_scenarios = 20*n_angles;
+n_scenarios = 10*n_angles;
 
-labels_angles = repmat(angles, 1, 20);
+labels_angles = repmat(angles, 1, 10);
 labels = deg2class(labels_angles);
 
 SNRs = [10 20 40];
@@ -48,15 +48,15 @@ for i = 1:n_scenarios
     clean(:,[3,4]) = reverb(clean(:,[3,4]));
    
     % Add white noise according to given SNR
-    noise = randn(size(clean)) .* std(clean)/db2mag(SNR);
-    % noise = randn(size(clean)) * 0.0001;
+    % noise = randn(size(clean)) .* std(clean)/db2mag(SNR);
+    noise = randn(size(clean)) * 0;
     noisy = clean + noise;
 
     noisy = noisy(:,[1 3 2 4]); % Create order of sources as in evaluation data
 
     features(i,:) = generate_features(noisy).';
     
-    % sound(noisy(:,[1,3]), 16000);
+    % sound(noisy(:,[1,3])*10, 16000);
     % time = length(noisy)/16000;
     % pause(time);
 end
