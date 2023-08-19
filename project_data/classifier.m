@@ -1,24 +1,18 @@
-cv = cvpartition(length(features), "HoldOut", 0.3);
-indexTrain = training(cv);
-indexVal = test(cv);
+%% Data Generation
+[samples, labels] = generateData('./recordings', 10);
 
-X_train = features(indexTrain,:);
-y_train = labels(1,indexTrain);
-X_val = features(indexVal,:);
-y_val = labels(1,indexVal,:);
+%% Feature Extraction
+featureNames = ["Front" "Back" "Left" "Right"];
+[features] = cell2mat(cellfun(@getGCCFeatures, samples, 'UniformOutput', false));
 
-random_forest = TreeBagger(50, X_train, y_train);
+%% Training
+tblTrain = array2table(features, 'VariableNames', featureNames);
 
-val_preds = str2double(predict(random_forest, X_val));
-val_correct = val_preds == y_val.';
-val_score = sum(val_correct)/length(val_correct);    
+model = fitctree(tblTrain, labels);
+validationLoss = cvloss(model);
 
-% development data
-[preds, gt] = test_classifier(random_forest);
-test_correct = preds == gt;
-test_score = sum(test_correct)/length(test_correct);
+%% Testing
+[testSamples , testLabels] = loadTestSignals();
+testFeatures = cell2mat(cellfun(@getGCCFeatures, testSamples, 'UniformOutput', false));
 
-val_score
-test_score
-
-
+testLoss = loss(model, testFeatures, testLabels);
