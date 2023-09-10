@@ -1,3 +1,20 @@
+% Generates samples of voice recordings from different directions and
+%  elevations. Takes raw voice recordings and folds them with an head
+%  related impulse response (HRIR) containing all the directional
+%  information.
+%  Always generates the same amout of samples fo earch angle in
+%  -175:5:180. Elevation, Noise, Distance and which raw samples are picked
+%  from the `voiceFolder` is random.
+%
+%
+% Inputs: 
+%   voiceFolder      : the source folder from which the samples are picked
+%   nSamplesPerAngle : amount of samples generated per angle (72 angles)
+%
+% Outpus:
+%   samplesCell : a cell containng all the generated voice samples
+%   labels      : the direction labels of the generated samples
+%
 function [samplesCell, labels] =  generateData(voiceFolder, nSamplesPerAngle)    
     baseAngles = -175:5:180;
     
@@ -33,7 +50,6 @@ function [samplesCell, labels] =  generateData(voiceFolder, nSamplesPerAngle)
         SNR = noiseValues(iScenario);
         elevation = elevations(iScenario);
         distance = distances(iScenario);
-        
         hrir = [getHRIR(distance, elevation, angle, "front").data getHRIR(distance, elevation, angle, "middle").data];
         hrir = hrir(:,[1 3 2 4]); % Create order of sources as in evaluation data
         

@@ -1,3 +1,11 @@
+% Loads the currently used test signals from the .mat file
+%  and calculates the correct labels for them.
+%
+%
+% Outputs:
+%   signals : cell containing the 6 test signals
+%   labels  : the correct labels of those signals
+%
 function [signals, labels] = loadTestSignals()
     dev_data = load("development_data.mat");
     fields = fieldnames(dev_data);
