@@ -1,6 +1,6 @@
 %% Data Generation
 fprintf("Starting data generation\n");
-[samples, labels] = generateData('./recordings', 5);
+[samples, labels] = generateData('./recordings', 10);
 
 %% Feature Extraction
 fprintf("Starting feature extraction\n");
@@ -19,4 +19,11 @@ fprintf("Starting testing\n");
 [testSamples , testLabels] = loadTestSignals();
 testFeatures = cell2mat(cellfun(@getGCCFeatures, testSamples, 'UniformOutput', false));
 
-lost = testSignals(model, testFeatures, testLabels);
+testLoss = testSignals(model, testFeatures, testLabels);
+
+%% Evaluation
+fprintf("Starting evaluation\n");
+evalSamples = loadEvaluationSignals();
+evalFeatures = cell2mat(cellfun(@getGCCFeatures, evalSamples, 'UniformOutput', false));
+
+evalPreds = predict(model, evalFeatures);
