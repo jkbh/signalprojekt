@@ -1,6 +1,6 @@
 %% Data Generation
 fprintf("Starting data generation\n");
-[samples, labels] = generateData('./recordings', 5);
+[samples, labels] = generateData('./recordings', 50);
 
 %% Feature Extraction
 fprintf("Starting feature extraction\n");
@@ -35,6 +35,6 @@ rad = deg2rad(angles);
 %        it actually is -150 - -179 and 151 - 180
 fprintf("---------------------------------------------\n");
 for i = 1:size(angles, 1) 
-    fprintf("eval_%02d: deg: %d - %d (rad: %f - %f)\n", i, min(angles(i, :)), max(angles(i, :)), min(rad(i, :)), max(rad(i, :)));
+    fprintf("eval_%02d: deg: %d° (rad: %f)\n", i, angles(i), rad(i));
 end 
 fprintf("---------------------------------------------\n");
